@@ -1,8 +1,25 @@
 % Fix the total number of users, Nusers, dropped within each macro geographical area, 
 %where Nusers is 30 or 60 in fading scenarios and 60 in non-fading scenarios.
 %v11 - changed to original(macro cell). 
-% Also the # of users is changed to 60.
+% Also the # of users is changed to 60. Finally, added combinations for
+% automatic run (different cell density and interferers), and macro LoS.
 
+% Vector of own RRHs
+vector_own_RRHs=[2,4];
+
+
+% Vector of interfering RRH
+vector_int_RRHs=[0,3];
+
+
+
+
+% Randomly and uniformly drop the configured number of low power nodes, N, ...
+...within each macro geographical area (the same number N for every macro geographical area, where N may take values from {1, 2, 4, 10}).
+for tt=1:length(vector_own_RRHs)
+
+for uu=1:length(vector_int_RRHs)
+    
 length_sq=600;
 
 %Macro
@@ -19,29 +36,35 @@ dist_UE_in_RRH=40; % 40
 
 %% General
 
-no_snapshots=500;
+no_snapshots=3000;
 Nusers=60; 
-total_no_RRH=30;
 
-% Number of interfering RRH
-
-no_macro_interferers=6;
-no_interfering_RRHs=20;
+% Vector of own RRHs
+vector_own_RRHs=[2,4,10];
 
 
-% Number of own RRHs
-own_no_RRH_per_macro=total_no_RRH-no_interfering_RRHs;
-  
-Nusers_lpn=2;
+% Vector of interfering RRH
+vector_int_RRHs=[0,3,10,20];
 
+       
+own_no_RRH_per_macro=vector_own_RRHs(tt);
+no_interfering_RRHs=vector_int_RRHs(uu);
+
+total_no_RRH=own_no_RRH_per_macro+no_interfering_RRHs;
 cmap = hsv(own_no_RRH_per_macro);
 
+%Users per clustter  
+Nusers_lpn=2;
+
 Nrem=Nusers-own_no_RRH_per_macro*Nusers_lpn;
+
+
+%Macro int
+no_macro_interferers=6;
+
+
+
  
-
-% Randomly and uniformly drop the configured number of low power nodes, N, ...
-...within each macro geographical area (the same number N for every macro geographical area, where N may take values from {1, 2, 4, 10}).
-
 tic
 for i=1:no_snapshots
      
@@ -517,4 +540,10 @@ if  no_interfering_RRHs~0
 save(strcat('v12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int','-append');
 end   
 
+end
+
+
+  clearvars -except vector_own_RRHs vector_int_RRHs tt uu
+
+end
 end
