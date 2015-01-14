@@ -5,11 +5,11 @@
 % automatic run (different cell density and interferers), and macro LoS.
 
 % Vector of own RRHs
-vector_own_RRHs=[2,4];
+vector_own_RRHs=[2,4,10];
 
 
 % Vector of interfering RRH
-vector_int_RRHs=[0,3];
+vector_int_RRHs=[0,3,10,20];
 
 
 
@@ -39,14 +39,7 @@ dist_UE_in_RRH=40; % 40
 no_snapshots=3000;
 Nusers=60; 
 
-% Vector of own RRHs
-vector_own_RRHs=[2,4,10];
-
-
-% Vector of interfering RRH
-vector_int_RRHs=[0,3,10,20];
-
-       
+     
 own_no_RRH_per_macro=vector_own_RRHs(tt);
 no_interfering_RRHs=vector_int_RRHs(uu);
 
