@@ -485,42 +485,42 @@ probLoS_all_ues_mac_int=min(18./distance_all_ues_2_macro_int,ones).*(1-exp(-dist
 if Nrem~=0
 
 %% 
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
     'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','ues_rrh_2_macro_int','other_ues_2_mac_int','other_ues_2_closest_RRH'...
     ,'ues_rrh_2_own_corr_RRH','other_ues_2_own_macro','ues_rrh_2_own_macro_resh','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
 
 if (total_no_RRH)>1
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
 end
 
 if (own_no_RRH_per_macro)>1
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','other_ues_2_own_int',...
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','other_ues_2_own_int',...
     'probLoS_all_ues_own_int','-append');
 
 end
 % 
 if  no_interfering_RRHs~=0
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int','other_ues_2_other_interf',...
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int','other_ues_2_other_interf',...
     'probLoS_all_ues_other_int','-append');
 
 end
 
 else
     
- save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
+ save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
     'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','ues_rrh_2_macro_int',...
   'ues_rrh_2_own_corr_RRH','ues_rrh_2_own_macro_resh','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
 % % 
 if (total_no_RRH)>1
-save(strcat('13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
 end
 
 if (own_no_RRH_per_macro)>1
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','probLoS_all_ues_own_int','-append');
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','probLoS_all_ues_own_int','-append');
 end
 % 
 if  no_interfering_RRHs~=0
-save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int', 'probLoS_all_ues_other_int','-append');
+save(strcat('v12_b_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int', 'probLoS_all_ues_other_int','-append');
 end   
 
 end
