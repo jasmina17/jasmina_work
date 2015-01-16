@@ -29,7 +29,7 @@ dist_UE_in_RRH=40; % 40
 
 %% General
 
-no_snapshots=25;
+no_snapshots=50;
 Nusers=60; 
 
      
