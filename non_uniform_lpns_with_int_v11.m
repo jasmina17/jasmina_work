@@ -1,54 +1,46 @@
 % Fix the total number of users, Nusers, dropped within each macro geographical area, 
 %where Nusers is 30 or 60 in fading scenarios and 60 in non-fading scenarios.
-%v11 - changed to original(macro cell). 
-% Also the # of users is changed to 60. Finally, added combinations for
-% automatic run (different cell density and interferers), and macro LoS.
+%v11 - Macro cell. Clustered distribution of users. Line of Sight
+%Probabilities.
 
 
-
-
-
-
-% Randomly and uniformly drop the configured number of low power nodes, N, ...
-...within each macro geographical area (the same number N for every macro geographical area, where N may take values from {1, 2, 4, 10}).
+% (3GPP 36.814) Randomly and uniformly drop the configured number of low power nodes, N, ...
+...within each macro geographical area...
+...(the same number N for every macro geographical area, where N may take values from {1, 2, 4, 10}).
 
     
 length_sq=600;
 
-%Macro
-min_UE_dist_to_mac=35; %35
+%Macro distance constraints
+min_UE_dist_to_mac=35; 
 radius_macro=250;
 small_mac_cir=min_UE_dist_to_mac;
 big_mac_cir=radius_macro;
 
-%RRH
-min_UE_RRH_dist=10; %10
-min_RRH_RRH_dist=40; %40
-min_mac_RRH_dist=75; %75
-dist_UE_in_RRH=40; % 40
+%RRH distance constraints
+min_UE_RRH_dist=10; 
+min_RRH_RRH_dist=40; 
+min_mac_RRH_dist=75; 
+dist_UE_in_RRH=40; 
 
 %% General
 
-no_snapshots=25;
+no_snapshots=1500;
 Nusers=60; 
 
      
-own_no_RRH_per_macro=30;
-no_interfering_RRHs=20;
-
 total_no_RRH=own_no_RRH_per_macro+no_interfering_RRHs;
 cmap = hsv(own_no_RRH_per_macro);
 
-%Users per clustter  
-Nusers_lpn=0;
+%Users per cluster  - differs from 3GPP as we want to explore more dense
+%deployments than 10. Hence, instead of 4 we have 2 users per a cluster.
+Nusers_lpn=2;
 
 Nrem=Nusers-own_no_RRH_per_macro*Nusers_lpn;
 
 
-%Macro int
+%Macro interferers
 no_macro_interferers=6;
-
-
 
  
 tic
@@ -90,16 +82,14 @@ for RRH_index=1:total_no_RRH
     temp_RRH_mac= distance_RRH_mac(i,RRH_index);
     
     % Step 3 - if this is the first RRH, check only the minimum distance
-    % requirement to macro and go back to the begining of RRH loop
-    % otherwise create another RRH at different position
+    % requirement to macro and go back to the begining of RRH loop.
+    % Otherwise create another RRH at different position
     
     if (RRH_index==1)& ((distance_RRH_mac(i,RRH_index))>=min_mac_RRH_dist)
            plot(x_pos_RRH(i,RRH_index),y_pos_RRH(i,RRH_index),'bs','MarkerSize', 12)
     break
     
-    
-    
-    
+          
     % Step 3 - Else, calculate the distance between the
     % RRHs
     
@@ -117,15 +107,14 @@ for RRH_index=1:total_no_RRH
        
        
         temp_rrh_rrh=cell2mat(rrhs_2_rrhs(i,RRH_index,1:(RRH_index-1)));
-%     
-      
+    
 
-% Then check if the distance between the nodes and to macro is OK. 
+% Then check if the distance between the RRH nodes and from each RRH to macro is OK. 
            
                       if ( temp_RRH_mac>=min_mac_RRH_dist)& ( temp_rrh_rrh>min_RRH_RRH_dist)
                  plot(x_pos_RRH(i,RRH_index), y_pos_RRH(i,RRH_index),'bs','MarkerSize', 12)
                
-                           break % If yes, go to the start of the RRH loop
+                           break % If yes, create next RRH.
 
          end
         end
@@ -133,7 +122,8 @@ for RRH_index=1:total_no_RRH
        end
     
 
-% In case there are interfering nodes, single out their xpos and ypos
+% In case there are interfering nodes, single out their xpos and ypos. The
+% last # of all randomly created RRHs.
     if no_interfering_RRHs~=0;
        for interferer_indx=1:no_interfering_RRHs
            xpos_int(i,interferer_indx)=x_pos_RRH(i,interferer_indx+own_no_RRH_per_macro);
@@ -159,8 +149,7 @@ for RRH_index=1:total_no_RRH
         end
     end
     
-%% Randomly and uniformly drop Nusers_lpn users within a 40 m radius of each operator's own low power node, where  with Photspot defined in 
-...Table A.2.1.1.2-5, where  Photspot is the fraction of all hotspot users over the total number of users in the network.
+%% Randomly and uniformly drop Nusers_lpn users within a 40 m radius of each operator's own low power node.
     
 for RRH_index_own=1:own_no_RRH_per_macro
     
@@ -179,8 +168,6 @@ for RRH_index_own=1:own_no_RRH_per_macro
 
             x_pos_u_lpn(i,user_index,RRH_index_own)= x_pos_RRH(i,RRH_index_own)+r1*cos(theta1);
             y_pos_u_lpn(i,user_index,RRH_index_own) =y_pos_RRH(i,RRH_index_own)+r1*sin(theta1);
-           
-    
     
                     % calculate the distance of these users to macro
                     
@@ -222,14 +209,14 @@ for RRH_index_own=1:own_no_RRH_per_macro
 
                     ...
             if  (ues_rrh_2_own_macro(i,user_index,RRH_index_own)>=min_UE_dist_to_mac)&(ues_rrh_2_own_macro(i,user_index,RRH_index_own)<=big_mac_cir)...
-         &(  ues_rrh_2_all_own_rrhs(i,user_index,RRH_index_own,:)>=min_UE_RRH_dist);
+         &(  ues_rrh_2_all_own_rrhs(i,user_index,RRH_index_own,:)>min_UE_RRH_dist);
      
      
 %      
 
                 if  no_interfering_RRHs~=0;
                     
-                    if(ues_RRH_2_interf(i,user_index,RRH_index_own,1:no_interfering_RRHs)>=min_UE_RRH_dist);
+                    if(ues_RRH_2_interf(i,user_index,RRH_index_own,1:no_interfering_RRHs)>min_UE_RRH_dist);
                     
             plot(x_pos_u_lpn(i,user_index,RRH_index_own),y_pos_u_lpn(i,user_index,RRH_index_own),'r*') ;
             
@@ -252,13 +239,13 @@ for RRH_index_own=1:own_no_RRH_per_macro
     
             end
             
-       end
+        end
         
- for k=1:no_macro_interferers
+        for k=1:no_macro_interferers
         ues_rrh_2_macro_int(i,user_index,RRH_index_own,k)=my_distance(x_pos_u_lpn(i,user_index,RRH_index_own),x_pos_macro_int(k), y_pos_u_lpn(i,user_index,RRH_index_own),y_pos_macro_int(k));
         end
 
-    end
+  end
  
 %% Randomly and uniformly drop the remaining users, Nusers - Nusers_lpn*N, 
 % ...to the entire macro geographical area of the given macro cell (including the low power node user dropping area)
@@ -298,7 +285,7 @@ for user_ind2=(own_no_RRH_per_macro*Nusers_lpn)+1:Nusers
            
        
         if no_interfering_RRHs~=0;
-            %calculate the distance of the remaining users to the
+            %calculate the distance of these users to the
             %interfering nodes
            
            for interferer_indx=1:no_interfering_RRHs
@@ -315,11 +302,11 @@ for user_ind2=(own_no_RRH_per_macro*Nusers_lpn)+1:Nusers
 % % 
 % % % % % % Check if in the correct zone
 
-if ( (other_ues_2_own_macro(i,user_ind2) >=min_UE_dist_to_mac)& (other_ues_2_own_RRH_all(i,user_ind2,:)>=min_UE_RRH_dist));
+if ( (other_ues_2_own_macro(i,user_ind2) >=min_UE_dist_to_mac)& (other_ues_2_own_RRH_all(i,user_ind2,:)>min_UE_RRH_dist));
     
     
     if no_interfering_RRHs~=0;
-        if other_ues_2_other_interf(i,user_ind2,:)>=min_UE_RRH_dist;
+        if other_ues_2_other_interf(i,user_ind2,:)>min_UE_RRH_dist;
 %     
            plot(x_pos(i,user_ind2),y_pos(i,user_ind2),'g*') ;
            
@@ -363,15 +350,17 @@ end
 end
 
 
+%% rearranging the variables and saving
+
 %% Distance of all users to the closest RRH/LPN node
 
-% temp1=ues_rrh_2_all_own_rrhs;
-% ues_rrh_2_all_own_rrhs=reshape(ues_rrh_2_all_own_rrhs,no_snapshots,Nusers_lpn*own_no_RRH_per_macro,own_no_RRH_per_macro);
-% ues_rrh_2_own_corr_RRH=min(ues_rrh_2_all_own_rrhs,[],3); % distance to the closest node 
+temp1=ues_rrh_2_all_own_rrhs;
+ues_rrh_2_all_own_rrhs=reshape(ues_rrh_2_all_own_rrhs,no_snapshots,Nusers_lpn*own_no_RRH_per_macro,own_no_RRH_per_macro);
+ues_rrh_2_own_corr_RRH=min(ues_rrh_2_all_own_rrhs,[],3); % distance to the closest node 
 
 
-% % %RRH (40m) users
-% ues_rrh_2_own_corr_RRH=reshape(ues_rrh_2_own_corr_RRH,no_snapshots,Nusers_lpn*own_no_RRH_per_macro);
+% RRH (40m) users
+ues_rrh_2_own_corr_RRH=reshape(ues_rrh_2_own_corr_RRH,no_snapshots,Nusers_lpn*own_no_RRH_per_macro);
 
 if Nrem~=0
 % remaining users
@@ -380,9 +369,8 @@ other_ues_2_own_RRH_all(:,1:own_no_RRH_per_macro*Nusers_lpn,:)=[];
 other_ues_2_closest_RRH=min(other_ues_2_own_RRH_all,[],3);
 
 % all users
-% distance_all_ues_2_closest_RRH=horzcat(other_ues_2_closest_RRH,ues_rrh_2_own_corr_RRH);
+distance_all_ues_2_closest_RRH=horzcat(other_ues_2_closest_RRH,ues_rrh_2_own_corr_RRH);
 
-distance_all_ues_2_closest_RRH=other_ues_2_closest_RRH;
 else
 distance_all_ues_2_closest_RRH=ues_rrh_2_own_corr_RRH;
 end
@@ -393,7 +381,7 @@ probLoS_all_ues_closest_RRH = min(18./distance_all_ues_2_closest_RRH,ones(size(d
 %% Distance of all users to serving macro 
 
 %reshaping rrh ues
-% ues_rrh_2_own_macro_resh=reshape(ues_rrh_2_own_macro,no_snapshots,own_no_RRH_per_macro*Nusers_lpn);
+ues_rrh_2_own_macro_resh=reshape(ues_rrh_2_own_macro,no_snapshots,own_no_RRH_per_macro*Nusers_lpn);
 
 %all users
 
@@ -402,9 +390,8 @@ if Nrem~=0
 
 other_ues_2_own_macro(:,1:own_no_RRH_per_macro*Nusers_lpn)=[];
 
-% distance_all_ues_2_own_macro=horzcat(other_ues_2_own_macro,ues_rrh_2_own_macro_resh);
+distance_all_ues_2_own_macro=horzcat(other_ues_2_own_macro,ues_rrh_2_own_macro_resh);
 
-distance_all_ues_2_own_macro=other_ues_2_own_macro;
 
 else
    distance_all_ues_2_own_macro=ues_rrh_2_own_macro_resh; 
@@ -420,11 +407,11 @@ exp(-distance_all_ues_2_own_macro/63);
 % %distance of rrh users to own interfering nodes
 
 if own_no_RRH_per_macro>1
-% rrh_ues_2_own_int_orig=ues_rrh_2_all_own_rrhs;
-% rrh_ues_2_own_int_orig=sort(rrh_ues_2_own_int_orig,3);
-% 
-% rrh_ues_2_own_int=rrh_ues_2_own_int_orig;
-% rrh_ues_2_own_int(:,:,1)=[];
+rrh_ues_2_own_int_orig=ues_rrh_2_all_own_rrhs;
+rrh_ues_2_own_int_orig=sort(rrh_ues_2_own_int_orig,3);
+
+rrh_ues_2_own_int=rrh_ues_2_own_int_orig;
+rrh_ues_2_own_int(:,:,1)=[];
 
 if Nrem~=0
 % %distance of remaining users to own interfering nodes (take out the
@@ -433,8 +420,8 @@ other_ues_2_own_int=sort(other_ues_2_own_RRH_all,3);
 other_ues_2_own_int(:,:,1)=[];
 
 % all users
-% distance_all_ues_2_own_interf=horzcat(rrh_ues_2_own_int,other_ues_2_own_int);
-distance_all_ues_2_own_interf=other_ues_2_own_int;
+distance_all_ues_2_own_interf=horzcat(rrh_ues_2_own_int,other_ues_2_own_int);
+
 else 
     
 distance_all_ues_2_own_interf=rrh_ues_2_own_int;
@@ -450,17 +437,16 @@ end
 %% Distance to other interferes
 if no_interfering_RRHs~=0;
 % distance of rrh users to other operators interferers
-% ues_rrh_2_other_int= ues_RRH_2_interf;
-% ues_rrh_2_other_int=reshape(ues_rrh_2_other_int,no_snapshots,Nusers_lpn*own_no_RRH_per_macro,no_interfering_RRHs);
+ues_rrh_2_other_int= ues_RRH_2_interf;
+ues_rrh_2_other_int=reshape(ues_rrh_2_other_int,no_snapshots,Nusers_lpn*own_no_RRH_per_macro,no_interfering_RRHs);
 
 if Nrem~=0
 % % distance of remaining users to other interferers - taking out 0s 
  
-% other_ues_2_other_interf(:,1:own_no_RRH_per_macro*Nusers_lpn,:)=[];
-% 
-% distance_all_ues_2_other_interf=horzcat(ues_rrh_2_other_int,other_ues_2_other_interf);
+other_ues_2_other_interf(:,1:own_no_RRH_per_macro*Nusers_lpn,:)=[];
 
-distance_all_ues_2_other_interf=other_ues_2_other_interf;
+distance_all_ues_2_other_interf=horzcat(ues_rrh_2_other_int,other_ues_2_other_interf);
+
 else
     
 distance_all_ues_2_other_interf=ues_rrh_2_other_int;    
@@ -477,16 +463,14 @@ end
 %% Distance to macro interferers
 % %distance of remaining users to macro interferers - taking out 0s 
 
-% temp2=ues_rrh_2_macro_int;
-% 
-% ues_rrh_2_macro_int=reshape(ues_rrh_2_macro_int,no_snapshots,own_no_RRH_per_macro*Nusers_lpn,no_macro_interferers);
+temp2=ues_rrh_2_macro_int;
+
+ues_rrh_2_macro_int=reshape(ues_rrh_2_macro_int,no_snapshots,own_no_RRH_per_macro*Nusers_lpn,no_macro_interferers);
 
 if Nrem~=0
 other_ues_2_mac_int(:,1:own_no_RRH_per_macro*Nusers_lpn,:)=[];
 
-distance_all_ues_2_macro_int=other_ues_2_mac_int;
-
-% distance_all_ues_2_macro_int=horzcat(ues_rrh_2_macro_int,other_ues_2_mac_int);
+distance_all_ues_2_macro_int=horzcat(ues_rrh_2_macro_int,other_ues_2_mac_int);
 
 else
     
@@ -500,51 +484,47 @@ probLoS_all_ues_mac_int=min(18./distance_all_ues_2_macro_int,ones).*(1-exp(-dist
 
 if Nrem~=0
 
-%% save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
-%     'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','ues_rrh_2_macro_int','other_ues_2_mac_int','other_ues_2_closest_RRH'...
-%     ,'ues_rrh_2_own_corr_RRH','other_ues_2_own_macro','ues_rrh_2_own_macro_resh','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
-save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
-    'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','other_ues_2_mac_int','other_ues_2_closest_RRH'...
-    ,'other_ues_2_own_macro','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
+%% 
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
+    'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','ues_rrh_2_macro_int','other_ues_2_mac_int','other_ues_2_closest_RRH'...
+    ,'ues_rrh_2_own_corr_RRH','other_ues_2_own_macro','ues_rrh_2_own_macro_resh','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
+
 if (total_no_RRH)>1
-save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
 end
 
 if (own_no_RRH_per_macro)>1
-% save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','other_ues_2_own_int',...
-%     'probLoS_all_ues_own_int','-append');
-save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','other_ues_2_own_int',...
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','other_ues_2_own_int',...
     'probLoS_all_ues_own_int','-append');
+
 end
 % 
-if  no_interfering_RRHs~0
-% save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int','other_ues_2_other_interf',...
-%     'probLoS_all_ues_other_int','-append');
-save(strcat('testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','other_ues_2_other_interf',...
+if  no_interfering_RRHs~=0
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int','other_ues_2_other_interf',...
     'probLoS_all_ues_other_int','-append');
+
 end
 
 else
     
- save(strcat('ue_rrh_testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
+ save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_RRH_mac',...
     'distance_all_ues_2_closest_RRH','distance_all_ues_2_own_macro', 'distance_RRH_2_mac_interferers','distance_all_ues_2_macro_int','ues_rrh_2_macro_int',...
   'ues_rrh_2_own_corr_RRH','ues_rrh_2_own_macro_resh','probLoS_all_ues_closest_RRH','probLoS_all_ues_mac_int','probLoS_all_ues_2_own_mac');
 % % 
 if (total_no_RRH)>1
-save(strcat('ue_rrh_testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
+save(strcat('13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'rrhs_2_rrhs','-append');
 end
 
 if (own_no_RRH_per_macro)>1
-save(strcat('ue_rrh_testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','probLoS_all_ues_own_int','-append');
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_own_interf','rrh_ues_2_own_int','probLoS_all_ues_own_int','-append');
 end
 % 
-if  no_interfering_RRHs~0
-save(strcat('ue_rrh_testv12_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int', 'probLoS_all_ues_other_int','-append');
+if  no_interfering_RRHs~=0
+save(strcat('v13_dist_non_uniform_RRH_',num2str(own_no_RRH_per_macro),'_with_',num2str(no_interfering_RRHs),'_int.mat'),'distance_all_ues_2_other_interf','ues_rrh_2_other_int', 'probLoS_all_ues_other_int','-append');
 end   
 
 end
 
 
-%   clearvars -except vector_own_RRHs vector_int_RRHs tt uu
 
 
