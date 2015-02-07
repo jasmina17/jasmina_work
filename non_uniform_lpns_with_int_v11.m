@@ -8,9 +8,6 @@
 %...(the same number N for every macro geographical area, where N may take values from {1, 2, 4, 10}).
 
 
-own_no_RRH_per_macro=2;
-no_interfering_RRHs=5;
-
 length_sq=600;
 %Macro distance constraints
 min_UE_dist_to_mac=35;
